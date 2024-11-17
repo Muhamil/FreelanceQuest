@@ -63,6 +63,8 @@ const PostJobLeft: React.FC = () => {
 
     toast.success(res.message);
 
+    setSkills([])
+
     form.reset();
   };
   const handleAddSkills = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -110,7 +112,7 @@ const PostJobLeft: React.FC = () => {
               id="description"
               label="Description"
               required
-              placeholder="Enter job title"
+              placeholder="Enter job description"
               maxLength={5000}
             />
           </div>

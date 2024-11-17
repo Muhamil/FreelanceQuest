@@ -43,6 +43,8 @@ export const signupController = generateController(
         email,
         password: bcrypt.hashSync(password, 10),
         role,
+        profileImage:
+          'https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0=',
       })
 
       await user.save()
@@ -344,7 +346,7 @@ export const deleteProfilePictureController = generateController(
       const updatedUser = await User.update(
         {
           profileImage:
-            'https://fafen.org/wp-content/uploads/2023/01/dummy.jpg',
+            'https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0=',
         },
         {
           returning: true,
@@ -356,6 +358,61 @@ export const deleteProfilePictureController = generateController(
 
       return {
         message: 'Profile image deleted successfully',
+        payload: {
+          user: updatedUser[1][0],
+        },
+      }
+    } catch (e) {
+      ErrorLogger.write(e)
+      const axiosError: AxiosError = e
+
+      let errorMessage = 'Failed to login'
+      if (e.message) {
+        errorMessage = e.message
+      }
+
+      raiseException(400, e.message)
+    }
+  }
+)
+
+export const updateProfileController = generateController(
+  async (req, res, raiseException) => {
+    try {
+      const { title, description, skills, category, hourlyRate, languages } =
+        req.body
+      const { userId } = req.params
+
+      console.log('req.body>>', req.body, req.params)
+
+      const user = await User.findOne({
+        where: {
+          id: userId,
+        },
+      })
+
+      if (!user) {
+        raiseException(400, 'User does not exist')
+      }
+
+      const updatedUser = await User.update(
+        {
+          title,
+          description,
+          languages,
+          category,
+          hourlyRate,
+        },
+        {
+          returning: true,
+          where: {
+            id: user.id,
+          },
+        }
+      )
+
+      return {
+        message: 'Profile updated successfully',
         payload: {
           user: updatedUser[1][0],
         },

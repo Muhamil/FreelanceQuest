@@ -7,6 +7,7 @@ import {
   loginThunk,
   logoutThunk,
   updateProfilePictureThunk,
+  updateUserProfileThunk,
 } from "../thunks/authThunk";
 
 // Utils
@@ -21,8 +22,10 @@ type AuthState = {
   logout: ActionTracker;
   updateProfilePicture: ActionTracker;
   deleteProfilePicture: ActionTracker;
+  updateUserProfile: ActionTracker;
 
   user: User | null;
+  token: string | null;
 };
 
 const initialState: AuthState = {
@@ -31,8 +34,10 @@ const initialState: AuthState = {
   logout: initialActionTracker,
   updateProfilePicture: initialActionTracker,
   deleteProfilePicture: initialActionTracker,
+  updateUserProfile: initialActionTracker,
 
   user: null,
+  token: null,
 };
 
 const authSlice = createSlice({
@@ -42,8 +47,17 @@ const authSlice = createSlice({
     logoutUser: (state) => {
       state.user = null;
     },
-    loginUser: (state, { payload }: PayloadAction<User>) => {
-      state.user = payload;
+    loginUser: (
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        user: User;
+        token: string;
+      }>
+    ) => {
+      state.user = payload.user;
+      state.token = payload.token;
     },
   },
   extraReducers: (builder) => {
@@ -158,6 +172,30 @@ const authSlice = createSlice({
     });
     builder.addCase(deleteProfilePictureThunk.rejected, (state, { error }) => {
       state.deleteProfilePicture = {
+        ...initialActionTracker,
+        isError: true,
+        errorMessage: error.message || "",
+      };
+    });
+
+    // Update User Profile
+    builder.addCase(updateUserProfileThunk.pending, (state) => {
+      state.updateUserProfile = {
+        ...initialActionTracker,
+        isLoading: true,
+      };
+    });
+    builder.addCase(updateUserProfileThunk.fulfilled, (state, action) => {
+      state.updateUserProfile = {
+        ...initialActionTracker,
+        isSuccess: true,
+        successMessage: "Profile picture updated successfully",
+      };
+
+      state.user = action.payload;
+    });
+    builder.addCase(updateUserProfileThunk.rejected, (state, { error }) => {
+      state.updateUserProfile = {
         ...initialActionTracker,
         isError: true,
         errorMessage: error.message || "",

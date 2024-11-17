@@ -43,7 +43,7 @@ export const ClientNavbarData = [
   },
   {
     title: "My Jobs",
-    link: "/client/my-jobs",
+    link: "/my-jobs",
   },
   {
     title: "Find Talent",
@@ -59,7 +59,7 @@ export const NavbarDropdownData = [
   },
   {
     title: "Settings",
-    link: "/settings",
+    link: "/account/settings",
     icon: <TbSettingsCog fontSize={14} />,
   },
 ];
